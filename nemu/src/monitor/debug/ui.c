@@ -8,6 +8,7 @@
 #include <readline/history.h>
 
 void cpu_exec(uint64_t);
+void isa_reg_display(void);
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -37,8 +38,8 @@ static int cmd_q(char *args) {
 }
 
 static int cmd_help(char *args);
-
 static int cmd_si(char *args);
+static int cmd_info(char *args);
 
 static struct {
   char *name;
@@ -48,7 +49,8 @@ static struct {
   { "help", "Display informations about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-  { "si", "si [N] Execute next N instructions, when N is not specified, execute one instruction", cmd_si },
+  { "si", "si [N] - Execute next N instructions, when N is not specified, execute one instruction", cmd_si },
+  { "info", "info [r] - show register status\n\tinfo [w] show watch point status", cmd_info },
 
   /* TODO: Add more commands */
 
@@ -90,6 +92,35 @@ static int cmd_si(char *args) {
   } else {
     // when arg is invalid, strtol returns 0
     steps = strtol(arg, NULL, 0);
+  }
+
+  if (steps > 0) {
+    cpu_exec(steps);
+  } else {
+    printf("Invalid argument: %s\n", arg);
+  }
+
+  return 0;
+}
+
+static int cmd_info(char *args) {
+  /* extract the first argument */
+  char *arg = strtok(NULL, " ");
+  int steps;
+
+  if (arg == NULL) {
+    printf("Lack subcmd\n");
+    return 0;
+  } else {
+    if (strcmp(arg, "r") == 0) {
+      isa_reg_display();
+    } else if (strcmp(arg, "w") == 0) {
+
+    } else {
+      printf("Invalid subcmd\n");
+    }
+
+    return 0;
   }
 
   if (steps > 0) {
