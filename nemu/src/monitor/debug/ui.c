@@ -40,6 +40,7 @@ static int cmd_q(char *args) {
 static int cmd_help(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
+static int cmd_x(char* args);
 
 static struct {
   char *name;
@@ -51,6 +52,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si", "si [N] - Execute next N instructions, when N is not specified, execute one instruction", cmd_si },
   { "info", "info [r] - show register status\n\tinfo [w] show watch point status", cmd_info },
+  { "x", "x N EXPR - Scan memory from EXPR, up to N bytes", cmd_x },
 
   /* TODO: Add more commands */
 
@@ -115,7 +117,7 @@ static int cmd_info(char *args) {
     if (strcmp(arg, "r") == 0) {
       isa_reg_display();
     } else if (strcmp(arg, "w") == 0) {
-
+      // TODO: watch point
     } else {
       printf("Invalid subcmd\n");
     }
@@ -125,6 +127,50 @@ static int cmd_info(char *args) {
 
   if (steps > 0) {
     cpu_exec(steps);
+  }
+
+  return 0;
+}
+
+#define X_BYTES_PER_LINE 8
+
+static int cmd_x(char* args) {
+  /* extract first two argument */
+  char* arg = NULL;
+  int nbytes = 0;
+  vaddr_t addr = 0;
+
+  if ((arg = strtok(NULL, " ")) == NULL) {
+    printf("Invalid argument N\n");
+    return 0;
+  }
+  nbytes = strtol(arg, NULL, 0);
+
+  if ((arg = strtok(NULL, " ")) == NULL) {
+    printf("Invalid argument EXPR\n");
+    return 0;
+  }
+  // TODO: now EXPR can only be integer
+  addr = strtol(arg, NULL, 0);
+
+  if (nbytes > 0) {
+    for (int i = 0; i < nbytes / X_BYTES_PER_LINE + (nbytes % X_BYTES_PER_LINE != 0); i++) {
+      printf("0x%08x:\t", addr + i * X_BYTES_PER_LINE);
+
+      for (int j = 0; j < X_BYTES_PER_LINE; j++) {
+        int offset = i * X_BYTES_PER_LINE + j;
+        if (offset >= nbytes) { 
+          break; 
+        }
+        // TODO: check invalid memory addr
+        printf("0x%02x", vaddr_read(addr + offset, 1));
+        if (j == X_BYTES_PER_LINE - 1 || offset == nbytes - 1) {
+          printf("\n");
+        } else {
+          printf("\t");
+        }
+      }
+    }
   }
 
   return 0;
