@@ -41,6 +41,7 @@ static int cmd_help(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
 static int cmd_x(char* args);
+static int cmd_p(char* args);
 
 static struct {
   char *name;
@@ -53,6 +54,7 @@ static struct {
   { "si", "si [N] - Execute next N instructions, when N is not specified, execute one instruction", cmd_si },
   { "info", "info [r] - show register status\n\tinfo [w] show watch point status", cmd_info },
   { "x", "x N EXPR - Scan memory from EXPR, up to N bytes", cmd_x },
+  { "p", "p EXPR - print result of the given expression", cmd_p },
 
   /* TODO: Add more commands */
 
@@ -171,6 +173,24 @@ static int cmd_x(char* args) {
         }
       }
     }
+  }
+
+  return 0;
+}
+
+static int cmd_p(char* args) {
+  bool success = false;
+  uint32_t result = 0;
+
+  if (args == NULL) {
+    return 0;
+  }
+
+  result = expr(args, &success);
+  if (!success) {
+    printf("Invalid expression %s\n", args ? args : "");
+  } else {
+    printf("%u\n", result);
   }
 
   return 0;

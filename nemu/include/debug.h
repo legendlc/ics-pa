@@ -25,4 +25,6 @@
 
 #define TODO() panic("please implement me")
 
+#define UNREACHABLE() panic("unreachable!")
+
 #endif
