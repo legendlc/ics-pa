@@ -137,29 +137,6 @@ static bool check_brackets(int begin, int end) {
   return (balance == 0);
 }
 
-// check surrounded by a pair of matched bracket
-static bool check_matched_brackets(int begin, int end) {
-  Assert(0 <= begin && end > begin && end < nr_token, "Token range");
-
-  if (tokens[begin].type != '(' || tokens[end].type != ')') {
-    return false;
-  }
-
-  int balance = 0;
-  for (int i = begin; i <= end; i++) {
-    if (tokens[i].type == '(') {
-      balance++;
-    } else if (tokens[i].type == ')') {
-      balance--;
-    }
-    if (balance < 0 || (balance == 0 && i != end)) {
-      return false;
-    }
-  }
-
-  return balance == 0;
-}
-
 static int find_matched_parenthesis(int begin, int end) {
   Assert(tokens[begin].type == '(', "arg");
 
@@ -176,8 +153,19 @@ static int find_matched_parenthesis(int begin, int end) {
       }
     }
   }
-  Assert(index > 0, " ");
+
   return index;
+}
+
+// check surrounded by a pair of matched bracket
+static bool check_surrounded_by_matched_brackets(int begin, int end) {
+  Assert(0 <= begin && end > begin && end < nr_token, "Token range");
+
+  if (tokens[begin].type != '(' || tokens[end].type != ')') {
+    return false;
+  }
+
+  return find_matched_parenthesis(begin, end) == end;
 }
 
 static bool is_operand(int type) {
@@ -241,7 +229,7 @@ static bool calc(int begin, int end, uint32_t *result) {
   }
 
   // expression is surrounded by a pair of matched brackets
-  if (check_matched_brackets(begin, end)) {
+  if (check_surrounded_by_matched_brackets(begin, end)) {
     return calc(begin + 1, end - 1, result);
   }
 
