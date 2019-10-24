@@ -214,7 +214,7 @@ static int find_main_operand(int begin, int end) {
   return operand;
 }
 
-static bool calc(int begin, int end, uint32_t *result) {
+static bool calc(int begin, int end, int* result) {
   if (begin > end) {
     return false;
   }
@@ -235,8 +235,8 @@ static bool calc(int begin, int end, uint32_t *result) {
   }
 
   // find main operand
-  uint32_t left_result = 0;
-  uint32_t right_result = 0;
+  int left_result = 0;
+  int right_result = 0;
   int operand = -1;
 
   if (0 > (operand = find_main_operand(begin, end))) {
@@ -287,7 +287,7 @@ uint32_t expr(char *e, bool *success) {
   }
 
   uint32_t result = 0;
-  *success = calc(0, nr_token - 1, &result);
+  *success = calc(0, nr_token - 1, (int*)&result);
   if (!(*success)) {
     return 0;
   }
