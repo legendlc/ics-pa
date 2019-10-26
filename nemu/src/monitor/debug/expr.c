@@ -185,9 +185,9 @@ static bool is_operand(int type) {
 }
 
 static int operand_priority(int type) {
-  if (type == TK_EQ || type == TK_NOT_EQ) {
+  if (type == TK_LOGICAL_AND) {
     return 0;
-  } else if (type == TK_LOGICAL_AND) {
+  } else if (type == TK_EQ || type == TK_NOT_EQ) {
     return 1;
   } else if (type == '+' || type == '-') {
     return 2;
