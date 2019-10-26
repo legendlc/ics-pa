@@ -18,6 +18,8 @@ enum {
   TK_REG,
   TK_NOT_EQ,
   TK_LOGICAL_AND,
+  TK_NEGATIVE,
+  TK_DEREF,
   /* TODO: Add more token types */
 };
 
@@ -78,6 +80,17 @@ typedef struct token {
 static Token tokens[MAX_NR_TOKEN] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
+static bool is_operand(int type) {
+  return type == TK_EQ || type == TK_NOT_EQ || type == TK_LOGICAL_AND
+          || type == '+' || type == '-' 
+          || type == '*' || type == '/'
+          || type == TK_NEGATIVE || type == TK_DEREF;
+}
+
+static bool is_unary_operand(int type) {
+  return type == TK_NEGATIVE || type == TK_DEREF;
+}
+
 static bool make_token(char *e) {
   int position = 0;
   int i;
@@ -124,6 +137,18 @@ static bool make_token(char *e) {
     if (i == NR_REGEX) {
       printf("no match at position %d\n%s\n%*.s^\n", position, e, position, "");
       return false;
+    }
+  }
+
+  // distinguish unary operators from binary operators
+  // e.g. deref/multiply, negative/minus
+  for (int i = 0; i < nr_token; i++) {
+    if (i == 0 || is_operand(tokens[i - 1].type)) {
+      if (tokens[i].type == '*') {
+        tokens[i].type = TK_DEREF;
+      } else if (tokens[i].type == '-') {
+        tokens[i].type = TK_NEGATIVE;
+      }
     }
   }
 
@@ -178,12 +203,6 @@ static bool check_surrounded_by_matched_brackets(int begin, int end) {
   return find_matched_parenthesis(begin, end) == end;
 }
 
-static bool is_operand(int type) {
-  return type == TK_EQ || type == TK_NOT_EQ || type == TK_LOGICAL_AND
-          || type == '+' || type == '-' 
-          || type == '*' || type == '/';
-}
-
 static int operand_priority(int type) {
   if (type == TK_LOGICAL_AND) {
     return 0;
@@ -193,6 +212,8 @@ static int operand_priority(int type) {
     return 2;
   } else if (type == '*' || type == '/') {
     return 3;
+  } else if (type == TK_NEGATIVE || type == TK_DEREF) {
+    return 4;
   } else {
     UNREACHABLE();
   }
@@ -267,6 +288,29 @@ static bool calc(int begin, int end, int* result) {
     return false;
   }
 
+  if (is_unary_operand(tokens[operand].type)) {
+    Assert(operand == begin, "unary operator");
+    int tmp;
+    if (!calc(operand + 1, end, &tmp)) {
+      return false;
+    }
+
+    switch (tokens[operand].type)
+    {
+      case TK_NEGATIVE:
+        *result = -1 * tmp;
+        break;
+      case TK_DEREF:
+        *result = (int)vaddr_read((uint32_t)tmp, 4);
+        break;
+      default:
+        UNREACHABLE();
+    }
+
+    return true;
+  }
+
+  // binary operator
   if (calc(begin, operand - 1, &left_result) 
     && calc(operand + 1, end, &right_result)) {
       switch (tokens[operand].type)
