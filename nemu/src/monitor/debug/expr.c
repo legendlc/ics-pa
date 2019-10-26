@@ -16,6 +16,8 @@ enum {
   TK_DEC,
   TK_HEX,
   TK_REG,
+  TK_NOT_EQ,
+  TK_LOGICAL_AND,
   /* TODO: Add more token types */
 };
 
@@ -39,6 +41,9 @@ static struct rule {
   {"0x[0-9a-fA-F]+", TK_HEX},   // hex number, must be parsed ahead of decimal number
   {"[[:digit:]]+", TK_DEC},     // decimal number
   {"\\$[a-z]{2,3}", TK_REG},    // registers
+  {"==", TK_EQ,},        // equal
+  {"!=", TK_NOT_EQ},     // not equal
+  {"&&", TK_LOGICAL_AND},// logical AND
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -174,14 +179,20 @@ static bool check_surrounded_by_matched_brackets(int begin, int end) {
 }
 
 static bool is_operand(int type) {
-  return type == '+' || type == '-' || type == '*' || type == '/';
+  return type == TK_EQ || type == TK_NOT_EQ || type == TK_LOGICAL_AND
+          || type == '+' || type == '-' 
+          || type == '*' || type == '/';
 }
 
 static int operand_priority(int type) {
-  if (type == '+' || type == '-') {
+  if (type == TK_EQ || type == TK_NOT_EQ) {
+    return 0;
+  } else if (type == TK_LOGICAL_AND) {
     return 1;
-  } else if (type == '*' || type == '/') {
+  } else if (type == '+' || type == '-') {
     return 2;
+  } else if (type == '*' || type == '/') {
+    return 3;
   } else {
     UNREACHABLE();
   }
@@ -271,6 +282,15 @@ static bool calc(int begin, int end, int* result) {
         break;
       case '/':
         *result = left_result / right_result;
+        break;
+      case TK_EQ:
+        *result = left_result == right_result;
+        break;
+      case TK_NOT_EQ:
+        *result = left_result != right_result;
+        break;
+      case TK_LOGICAL_AND:
+        *result = left_result && right_result;
         break;
       default:
         panic("Unreachable");
