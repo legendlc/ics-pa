@@ -8,13 +8,14 @@
 #include <sys/types.h>
 #include <regex.h>
 
+uint32_t isa_reg_str2val(const char *s, bool *success);
+
 enum {
   TK_NOTYPE = 256, 
   TK_EQ,
   TK_DEC,
-
+  TK_REG,
   /* TODO: Add more token types */
-
 };
 
 static struct rule {
@@ -35,6 +36,7 @@ static struct rule {
   {"\\(", '('},         // left bracket
   {"\\)", ')'},         // right bracket
   {"[[:digit:]]+", TK_DEC},     // decimal number
+  {"\\$[a-z]{2,3}", TK_REG},    // registers
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -224,6 +226,15 @@ static bool calc(int begin, int end, int* result) {
     if (tokens[begin].type == TK_DEC) {
       *result = strtoul(tokens[begin].str, NULL, 0);
       return true;
+    } else if (tokens[begin].type == TK_REG) {
+      bool is_valid_reg = false;
+      uint32_t reg_value = isa_reg_str2val(tokens[begin].str + 1, &is_valid_reg);
+      if (is_valid_reg) {
+        *result = (int)reg_value;
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }
