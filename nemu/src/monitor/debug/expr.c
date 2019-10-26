@@ -14,6 +14,7 @@ enum {
   TK_NOTYPE = 256, 
   TK_EQ,
   TK_DEC,
+  TK_HEX,
   TK_REG,
   /* TODO: Add more token types */
 };
@@ -35,6 +36,7 @@ static struct rule {
   {"==", TK_EQ},        // equal
   {"\\(", '('},         // left bracket
   {"\\)", ')'},         // right bracket
+  {"0x[0-9a-fA-F]+", TK_HEX},   // hex number, must be parsed ahead of decimal number
   {"[[:digit:]]+", TK_DEC},     // decimal number
   {"\\$[a-z]{2,3}", TK_REG},    // registers
 };
@@ -223,7 +225,7 @@ static bool calc(int begin, int end, int* result) {
 
   // only 1 token, it could only be number
   if (end == begin) {
-    if (tokens[begin].type == TK_DEC) {
+    if (tokens[begin].type == TK_DEC || tokens[begin].type == TK_HEX) {
       *result = strtoul(tokens[begin].str, NULL, 0);
       return true;
     } else if (tokens[begin].type == TK_REG) {
