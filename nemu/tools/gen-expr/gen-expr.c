@@ -11,6 +11,14 @@
 #define MAX_TOKEN 32
 #define BUF_SIZE 65536
 
+#define NR_OPERATOR_NUMERIC 4
+#define NR_OPERATOR_LOGICAL 3
+#define OPERATOR_NUMERIC_FREQ 3
+#define OPERATOR_LOGICAL_FREQ 1
+#define RAND_OPERATOR_SUM (NR_OPERATOR_NUMERIC * OPERATOR_NUMERIC_FREQ \
+                              + NR_OPERATOR_LOGICAL * OPERATOR_LOGICAL_FREQ)
+#define RAND_OPERATOR_LOGICAL_BASE (NR_OPERATOR_NUMERIC * OPERATOR_NUMERIC_FREQ)
+
 static char buf[BUF_SIZE];
 static int buf_len = 0;
 static int token_num = 0;
@@ -25,28 +33,59 @@ static void gen_rand_operator() {
     return;
   }
 
-  if (buf_len + 1 >= BUF_SIZE) {
-    buf_full = true;
-    return;
+  int operator_len = 0;
+  int operator = choose(RAND_OPERATOR_SUM);
+  if (operator < RAND_OPERATOR_LOGICAL_BASE) {
+    // +-*/
+    operator_len = 1;
+  } else {
+    // == or !=
+    operator_len = 2;
   }
 
+  if (buf_len + operator_len >= BUF_SIZE) {
+      buf_full = true;
+      return;
+  }
+
+  if (operator < RAND_OPERATOR_LOGICAL_BASE) {
+    switch (operator / OPERATOR_NUMERIC_FREQ) {
+      case 0:
+        buf[buf_len] = '+';
+        break;
+      case 1:
+        buf[buf_len] = '-';
+        break;
+      case 2:
+        buf[buf_len] = '*';
+        break;
+      case 3:
+        buf[buf_len] = '/';
+        break;
+      default:
+        assert(0);
+    }
+  } else {
+    switch ((operator - RAND_OPERATOR_LOGICAL_BASE) / OPERATOR_LOGICAL_FREQ)
+    {
+      case 0:
+        buf[buf_len] = '=';
+        buf[buf_len + 1] = '=';
+        break;
+      case 1:
+        buf[buf_len] = '!';
+        buf[buf_len + 1] = '=';
+        break;
+      case 2:
+        buf[buf_len] = '&';
+        buf[buf_len + 1] = '&';
+        break;
+      default:
+        assert(0);
+    }
+  }
   token_num++;
-  switch (choose(4)) {
-    case 0:
-      buf[buf_len++] = '+';
-      break;
-    case 1:
-      buf[buf_len++] = '-';
-      break;
-    case 2:
-      buf[buf_len++] = '*';
-      break;
-    case 3:
-      buf[buf_len++] = '/';
-      break;
-    default:
-      assert(0);
-  }  
+  buf_len += operator_len;
 }
 
 static void gen_rand_spaces(int n) {
