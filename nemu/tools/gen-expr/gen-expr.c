@@ -72,20 +72,39 @@ static inline void gen_rand_num(int max_digits) {
   }
 
   int digits = choose(max_digits) + 1;
-  if (buf_len + digits >= BUF_SIZE) {
-    buf_full = true;
-    return;
-  }
+  int radix = choose(2);
 
-  for (int i = 0; i < digits; i++) {
-    if (i == 0 && digits > 1) {
-      buf[buf_len + i] = choose(9) + 1 + '0';
-    } else {
-      buf[buf_len + i] = choose(10) + '0';
+  if (radix == 0) {
+    // decimal
+    if (buf_len + digits >= BUF_SIZE) {
+      buf_full = true;
+      return;
     }
+
+    for (int i = 0; i < digits; i++) {
+      if (i == 0 && digits > 1) {
+        buf[buf_len + i] = choose(9) + 1 + '0';
+      } else {
+        buf[buf_len + i] = choose(10) + '0';
+      }
+    }
+    buf_len += digits;
+    token_num++;
+  } else {
+    // hexadecimal
+    if (buf_len + digits + 2 >= BUF_SIZE) {
+      buf_full = true;
+      return;
+    }
+
+    buf[buf_len] = '0';
+    buf[buf_len + 1] = 'x';
+    for (int i = 0; i < digits; i++) {
+      buf[buf_len + 2 + i] = choose(10) + '0';
+    }
+    buf_len += (digits + 2);
+    token_num++;
   }
-  buf_len += digits;
-  token_num++;
 }
 
 static inline void gen_char(char ch) {
