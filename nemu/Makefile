@@ -55,7 +55,7 @@ $(OBJ_DIR)/%.o: src/%.c
 
 # Some convenient rules
 
-.PHONY: app run gdb clean run-env $(QEMU_SO)
+.PHONY: app run gdb clean run-env $(QEMU_SO) count count_effective
 app: $(BINARY)
 
 override ARGS ?= -l $(BUILD_DIR)/nemu-log.txt
@@ -84,3 +84,9 @@ clean:
 	-rm -rf $(BUILD_DIR)
 	$(MAKE) -C tools/gen-expr clean
 	$(MAKE) -C tools/qemu-diff clean
+
+count:
+	find ./ -name "*.[ch]" | xargs grep ".*" | wc -l
+
+count_effective:
+	find ./ -name "*.[ch]" | xargs grep -v "^[ \t\r\n]*$$" | wc -l
