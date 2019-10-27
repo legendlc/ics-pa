@@ -44,6 +44,12 @@ void cpu_exec(uint64_t n) {
      * instruction decode, and the actual execution. */
     __attribute__((unused)) vaddr_t seq_pc = exec_once();
 
+    /* watch point refresh */
+    if (refresh_wp()) {
+      nemu_state.state = NEMU_STOP;
+      display_changed_wp();
+    }
+
 #if defined(DIFF_TEST)
   difftest_step(ori_pc, cpu.pc);
 #endif

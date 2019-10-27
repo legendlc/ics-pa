@@ -42,6 +42,8 @@ static int cmd_si(char *args);
 static int cmd_info(char *args);
 static int cmd_x(char* args);
 static int cmd_p(char* args);
+static int cmd_w(char* args);
+static int cmd_d(char* args);
 
 static struct {
   char *name;
@@ -55,6 +57,8 @@ static struct {
   { "info", "info [r] - show register status\n\tinfo [w] show watch point status", cmd_info },
   { "x", "x N EXPR - Scan memory from EXPR, up to N bytes", cmd_x },
   { "p", "p EXPR - print result of the given expression", cmd_p },
+  { "w", "w EXPR - Set watchpoint, when expression value changed, stop executation", cmd_w },
+  { "d", "d N - delete watchpoint by NO.", cmd_d },
 
   /* TODO: Add more commands */
 
@@ -119,7 +123,7 @@ static int cmd_info(char *args) {
     if (strcmp(arg, "r") == 0) {
       isa_reg_display();
     } else if (strcmp(arg, "w") == 0) {
-      // TODO: watch point
+      display_wp();
     } else {
       printf("Invalid subcmd\n");
     }
@@ -190,7 +194,36 @@ static int cmd_p(char* args) {
   if (!success) {
     printf("Invalid expression %s\n", args ? args : "");
   } else {
-    printf("%u\n", result);
+    printf("%u\t0x%x\n", result, result);
+  }
+
+  return 0;
+}
+
+static int cmd_w(char* args) {
+  if (args == NULL) {
+    return 0;
+  }
+
+  WP* wp = new_wp(args);
+  if (wp == NULL) {
+    return 0;
+  }
+
+  return 0;
+}
+
+static int cmd_d(char* args) {
+  if (args == NULL) {
+    return 0;
+  }
+
+  char* endptr = NULL;
+  int number = strtol(args, &endptr, 0);
+  if (*args != '\0' && *endptr == '\0') {
+    delete_wp(number);
+  } else {
+    printf("Invalid watch point NO.\n");
   }
 
   return 0;

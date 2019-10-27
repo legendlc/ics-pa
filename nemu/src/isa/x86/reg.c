@@ -52,6 +52,11 @@ uint32_t isa_reg_str2val(const char *s, bool *success) {
   Assert(s != NULL && success != NULL, "null arg");
   *success = false;
 
+  if (strcmp(s, "eip") == 0) {
+    *success = true;
+    return cpu.pc;
+  }
+
   for (int i = 0; i < sizeof(regsl) / sizeof(char*); i++) {
     if (strcmp(s, regsl[i]) == 0) {
       *success = true;
