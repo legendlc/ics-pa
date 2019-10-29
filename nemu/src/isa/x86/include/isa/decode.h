@@ -45,6 +45,7 @@ make_DHelper(I_E2G);
 make_DHelper(I_G2E);
 make_DHelper(I);
 make_DHelper(r);
+make_DHelper(s2r);
 make_DHelper(E);
 make_DHelper(setcc_E);
 make_DHelper(gp7_E);

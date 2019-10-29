@@ -24,14 +24,7 @@ static inline make_DopHelper(SI) {
   assert(op->width == 1 || op->width == 4);
 
   op->type = OP_TYPE_IMM;
-
-  /* TODO: Use instr_fetch() to read `op->width' bytes of memory
-   * pointed by 'pc'. Interpret the result as a signed immediate,
-   * and assign it to op->simm.
-   *
-   op->simm = ???
-   */
-  TODO();
+  op->simm = (int32_t)instr_fetch(pc, op->width);
 
   rtl_li(&op->val, op->simm);
 
@@ -166,6 +159,11 @@ make_DHelper(I) {
 
 make_DHelper(r) {
   decode_op_r(pc, id_dest, true);
+}
+
+// s2r(stack to register): get reg number without load value
+make_DHelper(s2r) {
+  decode_op_r(pc, id_dest, false);
 }
 
 make_DHelper(E) {
