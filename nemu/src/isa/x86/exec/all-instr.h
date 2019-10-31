@@ -9,6 +9,7 @@ make_EHelper(setcc);
 make_EHelper(add);
 make_EHelper(sub);
 make_EHelper(cmp);
+make_EHelper(inc);
 // data-mov
 make_EHelper(mov);
 make_EHelper(push);

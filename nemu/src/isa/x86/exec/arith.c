@@ -48,7 +48,18 @@ make_EHelper(cmp) {
 }
 
 make_EHelper(inc) {
-  TODO();
+  rtl_li(&s0, 1);
+  rtl_add(&s1, &id_dest->val, &s0);
+  operand_write(id_dest, &s1);
+
+  // update OF
+  rtl_is_add_overflow(&s0, &s1, &id_dest->val, &s0, id_dest->width);
+  rtl_set_OF(&s0);
+  // update ZF/SF
+  rtl_update_ZFSF(&s1, id_dest->width);
+  // update CF
+  rtl_is_add_carry(&s0, &s1, &id_dest->val);
+  rtl_set_CF(&s0);
 
   print_asm_template1(inc);
 }
