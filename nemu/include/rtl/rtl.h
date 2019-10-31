@@ -6,6 +6,8 @@
 #include "rtl/relop.h"
 #include "rtl/rtl-wrapper.h"
 
+#define SIGN_BIT(v, width) (((v) >> (width * 8 - 1)) & 0x1)
+
 extern rtlreg_t s0, s1, t0, t1, ir;
 
 void decinfo_set_jmp(bool is_jmp);
@@ -132,12 +134,25 @@ void interpret_rtl_exit(int state, vaddr_t halt_pc, uint32_t halt_ret);
 
 static inline void rtl_not(rtlreg_t *dest, const rtlreg_t* src1) {
   // dest <- ~src1
-  TODO();
+  *dest = ~(*src1);
 }
 
 static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
-  TODO();
+  if (SIGN_BIT(*src1, width) == 0) {
+    rtl_mv(dest, src1);
+  } else {
+    if (width == 1) {
+      rtl_li(&ir, 0xFFFFFF00);
+    } else if (width == 2) {
+      rtl_li(&ir, 0xFFFF0000);
+    } else if (width == 4) {
+      rtl_li(&ir, 0x0);
+    } else {
+      assert(0);
+    }
+    rtl_or(dest, src1, &ir); 
+  }
 }
 
 static inline void rtl_setrelopi(uint32_t relop, rtlreg_t *dest,

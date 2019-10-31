@@ -30,7 +30,9 @@ static inline make_DopHelper(SI) {
     op->simm = (int32_t)instr_fetch(pc, op->width);
   }
 
-  rtl_li(&op->val, op->simm);
+  if (load_val) {
+    rtl_li(&op->val, op->simm);
+  }
 
   print_Dop(op->str, OP_STR_SIZE, "$0x%x", op->simm);
 }
@@ -264,6 +266,10 @@ make_DHelper(J) {
   decode_op_SI(pc, id_dest, false);
   // the target address can be computed in the decode stage
   decinfo.jmp_pc = id_dest->simm + *pc;
+}
+
+make_DHelper(J_indirect) {
+  decinfo.jmp_pc = id_dest->val;
 }
 
 make_DHelper(push_SI) {

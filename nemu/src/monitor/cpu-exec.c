@@ -47,7 +47,8 @@ void cpu_exec(uint64_t n) {
     /* watch point refresh */
     if (refresh_wp()) {
       nemu_state.state = NEMU_STOP;
-      display_changed_wp();
+      printf("%lu instructions executed, at 0x%08x\n", g_nr_guest_instr, cpu.pc);
+      display_wp();
     }
 
 #if defined(DIFF_TEST)

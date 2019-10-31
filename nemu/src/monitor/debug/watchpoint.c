@@ -62,7 +62,6 @@ WP* new_wp(char* e) {
   }
   strcpy(wp->expr, e);
   wp->prev_value = result;
-  wp->changed = false;
 
   return wp;
 }
@@ -99,7 +98,8 @@ void delete_wp(int no) {
 void display_wp() {
   WP* tmp = head;
   while (tmp != NULL) {
-    printf("[%d] %s -> %u\n", tmp->NO, tmp->expr, tmp->prev_value);
+    printf("[%d] %s -> 0x%x/%u/%d\n", tmp->NO, tmp->expr, 
+      tmp->prev_value, tmp->prev_value, (int32_t)tmp->prev_value);
     tmp = tmp->next;
   }
 }
@@ -135,20 +135,11 @@ bool refresh_wp() {
   while (wp != NULL) {
     bool success;
     uint32_t new_value = expr(wp->expr, &success);
-    wp->changed = (new_value != wp->prev_value);
+    has_change = has_change || (new_value != wp->prev_value);
     wp->prev_value = new_value;
-    has_change = has_change || wp->changed;
 
     wp = wp->next;
   }
 
   return has_change;
-}
-
-void display_changed_wp() {
-  WP* tmp = head;
-  while (tmp != NULL && tmp->changed) {
-    printf("[%d] %s -> %u\n", tmp->NO, tmp->expr, tmp->prev_value);
-    tmp = tmp->next;
-  }
 }

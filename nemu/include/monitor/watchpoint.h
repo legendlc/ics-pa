@@ -20,6 +20,5 @@ void delete_wp(int no);
 void display_wp();
 void test_wp();
 bool refresh_wp();
-void display_changed_wp();
 
 #endif

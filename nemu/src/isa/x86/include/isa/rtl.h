@@ -3,8 +3,6 @@
 
 #include "rtl/rtl.h"
 
-#define SIGN_BIT(v, width) (((v) >> (width * 8 - 1)) & 0x1)
-
 /* RTL pseudo instructions */
 
 static inline void rtl_lr(rtlreg_t* dest, int r, int width) {
@@ -95,11 +93,11 @@ static inline void rtl_is_add_carry(rtlreg_t* dest,
       CPU_EFLAGS(f) = 0; \
     } \
   } \
-  static inline void concat(rtl_get_, f) (rtlreg_t* dest) { \
+  static inline void concat(rtl_get_, f) (rtlreg_t* _dest) { \
     if (CPU_EFLAGS(f) != 0) { \
-      *dest = 1; \
+      *_dest = 1; \
     } else { \
-      *dest = 0; \
+      *_dest = 0; \
     } \
   }
 
