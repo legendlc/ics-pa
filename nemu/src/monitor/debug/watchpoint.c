@@ -137,7 +137,7 @@ bool refresh_wp() {
     uint32_t new_value = expr(wp->expr, &success);
     wp->changed = (new_value != wp->prev_value);
     wp->prev_value = new_value;
-    has_change = true;
+    has_change = has_change || wp->changed;
 
     wp = wp->next;
   }
