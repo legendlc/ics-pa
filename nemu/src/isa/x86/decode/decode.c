@@ -24,7 +24,11 @@ static inline make_DopHelper(SI) {
   assert(op->width == 1 || op->width == 4);
 
   op->type = OP_TYPE_IMM;
-  op->simm = (int32_t)instr_fetch(pc, op->width);
+  if (op->width == 1) {
+    op->simm = (int32_t)((int8_t)(instr_fetch(pc, op->width) & 0xFF));
+  } else {
+    op->simm = (int32_t)instr_fetch(pc, op->width);
+  }
 
   rtl_li(&op->val, op->simm);
 
@@ -106,7 +110,7 @@ make_DHelper(mov_E2G) {
   decode_op_rm(pc, id_src, true, id_dest, false);
 }
 
-make_DHelper(lea_M2G) {
+make_DHelper(lea_E2G) {
   decode_op_rm(pc, id_src, false, id_dest, false);
 }
 

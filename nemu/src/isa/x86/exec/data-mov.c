@@ -31,7 +31,11 @@ make_EHelper(popa) {
 }
 
 make_EHelper(leave) {
-  TODO();
+  assert(id_dest->width == 4);
+  rtl_lr(&s0, R_EBP, id_dest->width);
+  rtl_sr(R_ESP, &s0, id_dest->width);
+  rtl_pop(&s0);
+  rtl_sr(R_EBP, &s0, id_dest->width);
 
   print_asm("leave");
 }
