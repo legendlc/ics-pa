@@ -33,6 +33,28 @@ typedef struct {
     };
   };
 
+  struct {
+    uint8_t CF          :1;
+    uint8_t _not_used0  :1;
+    uint8_t PF          :1;
+    uint8_t _not_used1  :1;
+    uint8_t AF          :1;
+    uint8_t _not_used2  :1;
+    uint8_t ZF          :1;
+    uint8_t SF          :1;
+
+    uint8_t TF          :1;
+    uint8_t IF          :1;
+    uint8_t DF          :1;
+    uint8_t OF          :1;
+    uint8_t IOPL        :2;
+    uint8_t NT          :1;
+    uint8_t _not_used3  :1;
+
+    uint8_t RF          :1;
+    uint8_t VM          :1;
+    uint32_t _reserved  :14;
+  };
   vaddr_t pc;
 } CPU_state;
 
