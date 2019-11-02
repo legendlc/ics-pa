@@ -55,6 +55,15 @@ void isa_reg_display() {
   printf("\tCF: %1x\n", cpu.CF);
 }
 
+void isa_reg_display_ex(CPU_state* c) {
+  int i;
+  for (i = R_EAX; i <= R_EDI; i++) {
+    printf("%s\t0x%08x\t%d\n", regsl[i], c->gpr[i]._32, c->gpr[i]._32);
+  }
+
+  printf("eip\t0x%08x\t%d\n", c->pc, c->pc);
+}
+
 uint32_t isa_reg_str2val(const char *s, bool *success) {
   Assert(s != NULL && success != NULL, "null arg");
   *success = false;

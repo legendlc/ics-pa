@@ -33,6 +33,8 @@ typedef struct {
     };
   };
 
+  vaddr_t pc;
+
   struct {
     uint8_t CF          :1;
     uint8_t _not_used0  :1;
@@ -55,7 +57,6 @@ typedef struct {
     uint8_t VM          :1;
     uint32_t _reserved  :14;
   };
-  vaddr_t pc;
 } CPU_state;
 
 static inline int check_reg_index(int index) {
