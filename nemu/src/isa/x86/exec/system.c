@@ -48,7 +48,15 @@ make_EHelper(in) {
 }
 
 make_EHelper(out) {
-  TODO();
+  if (id_src->width == 1) {
+    pio_write_b(id_dest->val, id_src->val);
+  } else if (id_src->width == 2) {
+    pio_write_w(id_dest->val, id_src->val);
+  } else if (id_src->width == 4) {
+    pio_write_l(id_dest->val, id_src->val);
+  } else {
+    assert(0);
+  }
 
   print_asm_template2(out);
 }
