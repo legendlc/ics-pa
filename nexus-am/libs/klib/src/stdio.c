@@ -89,6 +89,8 @@ int sprintf(char *out, const char *fmt, ...) {
     }
   }
   out[out_idx] = '\0';
+  va_end(ap);
+
   return out_idx;
 }
 
