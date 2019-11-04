@@ -52,6 +52,44 @@ static size_t print_d(putc_func_t f, char* dst, int d, char padding, int padding
   return offset;
 }
 
+static size_t print_x(putc_func_t f, char* dst, unsigned int d, char padding, int padding_width, int lowercase) {
+  int len = 0;
+  int offset = 0;
+  char buf[16]; // UINT_MAX = 0xFFFFFFFF, 8 chars
+
+  if (d == 0) {
+    f(dst, '0');
+    return 1;
+  }
+
+  while (d != 0) {
+    if (d % 16 < 10) {
+      buf[len] = '0' + (d % 16);
+    } else {
+      if (lowercase) {
+        buf[len] = 'a' + (d % 16 - 10);
+      } else {
+        buf[len] = 'A' + (d % 16 - 10);
+      }
+    }
+    len++;
+    d /= 16;
+  }
+
+  offset = padding_width - len <= 0 ? 0 : padding_width - len;
+  for (int i = 0; i < offset; i++) {
+    f(dst + i, padding);
+  }
+
+  for (size_t i = 0; i < len; i++) {
+    f(dst + offset + i, buf[len - i - 1]);
+  }
+  offset += len;
+
+  assert(offset > 0);
+  return offset;
+}
+
 static size_t print_s(putc_func_t f, char* dst, const char* s, char padding, int padding_width) {
   assert(s);
   size_t len = strlen(s);
@@ -116,6 +154,11 @@ int vsprintf_ex(putc_func_t f, char *out, const char *fmt, va_list ap) {
       if (type == 'd') {
         int v = va_arg(ap, int);
         len = print_d(f, out + out_idx, v, padding, padding_width);
+        out_idx += len;
+        idx++;
+      } else if (type == 'x' || type == 'X') {
+        unsigned int v = va_arg(ap, unsigned int);
+        len = print_x(f, out + out_idx, v, padding, padding_width, type == 'x');
         out_idx += len;
         idx++;
       } else if (type == 's') {

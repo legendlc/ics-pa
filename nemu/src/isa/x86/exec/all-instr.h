@@ -10,6 +10,7 @@ make_EHelper(setcc);
 make_EHelper(sar);
 make_EHelper(shl);
 make_EHelper(shr);
+make_EHelper(rol);
 // arith
 make_EHelper(add);
 make_EHelper(adc);
@@ -21,6 +22,8 @@ make_EHelper(dec);
 make_EHelper(mul);
 make_EHelper(imul1);
 make_EHelper(imul2);
+make_EHelper(imul3);
+make_EHelper(div);
 make_EHelper(idiv);
 make_EHelper(neg);
 // data-mov
@@ -32,6 +35,7 @@ make_EHelper(lea);
 make_EHelper(movzx);
 make_EHelper(movsx);
 make_EHelper(cltd);
+make_EHelper(cwtl);
 // control
 make_EHelper(call);
 make_EHelper(ret);

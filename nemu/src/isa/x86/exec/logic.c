@@ -75,6 +75,30 @@ make_EHelper(shr) {
   print_asm_template2(shr);
 }
 
+make_EHelper(rol) {
+  if (id_dest->width == 1) {
+    rtl_li(&ir, 0xFF);
+  } else if (id_dest->width == 2) {
+    rtl_li(&ir, 0xFFFF);
+  } else if (id_dest->width == 4) {
+    rtl_li(&ir, 0xFFFFFFFF);
+  } else {
+    assert(0);
+  }
+
+  int times = (id_src->val) % (id_dest->width * 8);
+  for (int i = 0; i < times; i++) {
+    rtl_li(&s0, SIGN_BIT(id_dest->val, id_dest->width));
+    rtl_get_CF(&s1);
+    id_dest->val = (id_dest->val << 1);
+    id_dest->val &= ir;
+    id_dest->val |= s1;
+    rtl_set_CF(&s0);
+  }
+
+  operand_write(id_dest, &id_dest->val);
+}
+
 make_EHelper(setcc) {
   uint32_t cc = decinfo.opcode & 0xf;
 
