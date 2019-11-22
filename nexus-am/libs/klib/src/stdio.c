@@ -161,6 +161,11 @@ int vsprintf_ex(putc_func_t f, char *out, const char *fmt, va_list ap) {
         len = print_x(f, out + out_idx, v, padding, padding_width, type == 'x');
         out_idx += len;
         idx++;
+      } else if (type == 'p') { 
+        void* v = va_arg(ap, void*);
+        len = print_x(f, out + out_idx, (unsigned long)v, '0', 8, 1);
+        out_idx += len;
+        idx++;
       } else if (type == 's') {
         const char* s = va_arg(ap, char*);
         len = print_s(f, out + out_idx, s, padding, padding_width);
