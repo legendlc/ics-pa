@@ -19,13 +19,19 @@ make_EHelper(pop) {
 }
 
 make_EHelper(pusha) {
-  TODO();
+  assert(id_dest->width == 4);
+  for (int i = R_EAX; i <= R_EDI; i++) {
+    rtl_push(&reg_l(i));
+  }
 
   print_asm("pusha");
 }
 
 make_EHelper(popa) {
-  TODO();
+  assert(id_dest->width == 4);
+  for (int i = R_EDI; i >= R_EAX; i--) {
+    rtl_pop(&reg_l(i));
+  }
 
   print_asm("popa");
 }

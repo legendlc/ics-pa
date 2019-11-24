@@ -29,7 +29,9 @@ make_EHelper(neg);
 // data-mov
 make_EHelper(mov);
 make_EHelper(push);
+make_EHelper(pusha);
 make_EHelper(pop);
+make_EHelper(popa);
 make_EHelper(leave);
 make_EHelper(lea);
 make_EHelper(movzx);
@@ -49,3 +51,6 @@ make_EHelper(nop);
 // system
 make_EHelper(in);
 make_EHelper(out);
+make_EHelper(int);
+make_EHelper(iret);
+make_EHelper(lidt);
