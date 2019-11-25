@@ -18,7 +18,24 @@ static const char *keyname[256] __attribute__((used)) = {
 };
 
 size_t events_read(void *buf, size_t offset, size_t len) {
-  return 0;
+  _DEV_INPUT_KBD_t kbd = {0};
+  _DEV_TIMER_UPTIME_t uptime = {0};
+
+  assert(buf);
+
+  _io_read(_DEV_INPUT, _DEVREG_INPUT_KBD, &kbd, sizeof(kbd));
+  if (kbd.keycode != _KEY_NONE) {
+    if (kbd.keydown) {
+      sprintf(buf, "kd %s\n", keyname[kbd.keycode]);
+    } else {
+      sprintf(buf, "ku %s\n", keyname[kbd.keycode]);
+    }
+  } else {
+    _io_read(_DEV_TIMER, _DEVREG_TIMER_UPTIME, &uptime, sizeof(uptime));
+    sprintf(buf, "t %d\n", uptime.lo);
+  }
+
+  return strlen(buf);
 }
 
 static char dispinfo[128] __attribute__((used)) = {};
