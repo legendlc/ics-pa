@@ -25,7 +25,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   for (int i = 0; i < ehdr.e_phnum; i++) {
     Elf_Phdr phdr = {0};
     assert(sizeof(phdr) == ehdr.e_phentsize);
-    
+
     fs_read(fd, &phdr, sizeof(phdr));
     if (phdr.p_type != PT_LOAD) {
       continue;
@@ -33,7 +33,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     size_t read_offset = fs_lseek(fd, 0, SEEK_CUR);
     printk("Program header [%d]: type %x, file offset %x, filesize %x, mem %x, memsize %x\n",
       i, phdr.p_type, phdr.p_offset, phdr.p_filesz, phdr.p_vaddr, phdr.p_memsz);
-    
+
     fs_lseek(fd, phdr.p_offset, SEEK_SET);
     fs_read(fd, (void*)(phdr.p_vaddr), phdr.p_filesz);
     memset((void*)(phdr.p_vaddr + phdr.p_filesz), 0, phdr.p_memsz - phdr.p_filesz);

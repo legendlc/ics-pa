@@ -10,6 +10,7 @@ static _Context* do_event(_Event e, _Context* c) {
       break;
     case _EVENT_YIELD:
       //printk("\tYield\n");
+      _yield();
       break;
     default: 
       panic("Unhandled event ID = %d", e.event);
