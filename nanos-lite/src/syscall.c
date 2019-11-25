@@ -19,14 +19,7 @@ _Context* do_syscall(_Context *c) {
       c->GPRx = 0;
       break;
     case SYS_write:
-      if ((int)a[1] == 1 || (int)a[1] == 2) { // stdout or stderr
-        for (size_t i = 0; i < (size_t)a[3]; i++) {
-          _putc(((char*)(a[2]))[i]);
-        }
-        c->GPRx = a[3];
-      } else if ((int)a[1] > 2) { // files
-        c->GPRx = fs_write((int)(a[1]), (void*)(a[2]), (size_t)(a[3]));
-      }
+      c->GPRx = fs_write((int)(a[1]), (void*)(a[2]), (size_t)(a[3]));
       break;
     case SYS_brk:
       // do nothing
