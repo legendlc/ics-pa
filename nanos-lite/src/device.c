@@ -35,27 +35,42 @@ size_t events_read(void *buf, size_t offset, size_t len) {
     sprintf(buf, "t %d\n", uptime.lo);
   }
 
+  assert(strlen(buf) < len);
   return strlen(buf);
 }
 
 static char dispinfo[128] __attribute__((used)) = {};
 
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
-  return 0;
+  assert(buf && offset <= strlen(dispinfo) && strlen(dispinfo + offset) < len);
+  strcpy(buf, dispinfo + offset);
+
+  return strlen(buf);
 }
 
 size_t fb_write(const void *buf, size_t offset, size_t len) {
-  return 0;
+  assert(offset % 4 == 0 && len % 4 == 0);
+  size_t row_len = screen_width() * 4;
+  size_t row_offset = offset % row_len;
+  assert(row_offset + len <= row_len); // TODO: now only support draw one row
+
+  int x = row_offset / 4;
+  int y = offset / row_len;
+  int w = len / 4;
+  int h = 1;
+  draw_rect((uint32_t*)buf, x, y, w, h);
+
+  return len;
 }
 
 size_t fbsync_write(const void *buf, size_t offset, size_t len) {
-  return 0;
+  draw_sync();
+  return len;
 }
 
 void init_device() {
   Log("Initializing devices...");
   _ioe_init();
 
-  // TODO: print the string to array `dispinfo` with the format
-  // described in the Navy-apps convention
+  sprintf(dispinfo, "WIDTH:%d\nHEIGHT:%d\n", screen_width(), screen_height());
 }
